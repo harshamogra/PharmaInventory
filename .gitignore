@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 #environment variables...
-.env
+backend/.env
 
 ca.pem

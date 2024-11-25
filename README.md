@@ -1,4 +1,4 @@
-# Pharmaceutical Management System
+# Pharmaceutical Inventory and Prescription management system
 
 ## Overview
 

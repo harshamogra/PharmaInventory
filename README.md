@@ -30,12 +30,12 @@ Ensure you have the following installed:
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/pharmaceutical-management-system.git
+    git clone https://github.com/harshamogra/PharmaInventory.git
     ```
 
 2. **Navigate to the project directory:**
     ```bash
-    cd pharmaceutical-management-system
+    cd pharmainventory
     ```
 
 3. **Install dependencies:**
@@ -45,7 +45,7 @@ Ensure you have the following installed:
 
 4. **Start the development server:**
     ```bash
-    npm start
+    npm run dev
     ```
     This will start the app on `http://localhost:3000`.
 
@@ -58,15 +58,6 @@ Ensure you have the following installed:
   - **App.jsx**: The main entry point of the application where routing is defined.
   - **index.jsx**: The root file where the React app is rendered.
 
-## Screenshots
-
-### Home Page
-
-![Home Page](./src/assets/home.jpg)
-
-### Login Page
-
-(Screenshot of the login page goes here)
 
 ## Contribution Guidelines
 

@@ -1,12 +1,17 @@
 const mysql = require('mysql2');
+const fs = require('fs');
 require('dotenv').config();
 
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,     // usually 'localhost'
-  user: process.env.DB_USER,     // 'root'
-  password: process.env.DB_PASS,  // your password
-  database: process.env.DB_NAME,  // 'PharmaInventory'
-  port: 3306                       // default MySQL port, adjust if needed
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  ssl: {
+    ca: fs.readFileSync('../ca.pem'),  // path to your downloaded CA cert
+  },
+  connectTimeout: 10000, // optional, increase timeout if needed
 });
 
 connection.connect((err) => {

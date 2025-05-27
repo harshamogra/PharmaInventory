@@ -408,7 +408,7 @@ router.put('/fulfill-supplier-change/:id', (req, res) => {
 
 
 router.get('/supplier-change-requests', (req, res) => {
-  const query = 'SELECT * FROM changesupplier WHERE status = "Pending"';
+  const query = "SELECT * FROM changesupplier WHERE status = 'Pending'";
 
   db.query(query, (err, results) => {
     if (err) {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from '../../api';
 
 const initialPrescription = {
   patient_id: "",
@@ -38,15 +39,15 @@ const Prescription = () => {
 
     try {
       console.log(`Fetching prescriptions for patient ID: ${patientId}`);
-      const response = await fetch(`http://localhost:5000/api/doctor/prescriptions/${patientId}`, {
+      const response = await api.get(`/api/doctor/prescriptions/${patientId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Send JWT token in Authorization header
         },
       });
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Failed to fetch prescriptions.");
       }
-      const data = await response.json();
+      const data = response.data;
       console.log("Prescriptions fetched successfully:", data);
       setPrescriptions(data);
     } catch (err) {
@@ -78,26 +79,23 @@ const Prescription = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/doctor/prescriptions", {
-        method: "POST",
+      const response = await api.post("/api/doctor/prescriptions", {
+        patient_id: prescription.patient_id,
+        doctor_id: doctorId,
+        prescription_date: prescription.prescription_date,
+        medications: prescription.medications,
+        instructions: prescription.instructions,
+      }, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, // Send JWT token in Authorization header
         },
-        body: JSON.stringify({
-          patient_id: prescription.patient_id,
-          doctor_id: doctorId,
-          prescription_date: prescription.prescription_date,
-          medications: prescription.medications,
-          instructions: prescription.instructions,
-        }),
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Failed to add prescription.");
       }
 
-      const newPrescription = await response.json();
+      const newPrescription = response.data;
       console.log("Prescription added successfully:", newPrescription);
 
       // Update the list directly or refetch the data

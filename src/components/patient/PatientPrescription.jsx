@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from '../../api';
 
 const PatientPrescription = () => {
   const [patientId, setPatientId] = useState("");
@@ -23,19 +24,18 @@ const PatientPrescription = () => {
   const handleFetchPrescriptions = async (patientId, token) => {
     try {
       console.log(`Fetching prescriptions for patient ID: ${patientId}`);
-      const response = await fetch(`http://localhost:5000/api/patient/prescription/${patientId}`, {
+      const response = await api.get(`/api/patient/prescription/${patientId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Send JWT token in the Authorization header
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error fetching prescriptions:", errorData);
+      if (response.status !== 200) {
+        console.error("Error fetching prescriptions:", response.data);
         throw new Error("Failed to fetch prescriptions.");
       }
 
-      const data = await response.json();
+      const data = response.data;
       console.log("Prescriptions fetched successfully:", data);
       setPrescriptions(data);
     } catch (err) {

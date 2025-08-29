@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import api from '../../api';
 
-const API_BASE_URL = "http://localhost:5000/api/pharmacist"; // replace with your backend API base URL
+const API_BASE_URL = "/api/pharmacist"; // Updated to use relative path
 
 const PharmacistInventory = () => {
   const [inventory, setInventory] = useState([]);
@@ -29,12 +30,12 @@ const PharmacistInventory = () => {
 
   const fetchInventory = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/inventory?pharmacistId=${pharmacistId}`, {
+      const response = await api.get(`${API_BASE_URL}/inventory?pharmacistId=${pharmacistId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      const data = await response.json();
+      const data = response.data;
       console.log('Inventory response:', data);
       setInventory(data);
     } catch (error) {
@@ -48,15 +49,15 @@ const PharmacistInventory = () => {
         return;
     }
     try {
-        const response = await fetch(`${API_BASE_URL}/check?pharmacistId=${pharmacistId}`, {
+        const response = await api.get(`${API_BASE_URL}/check?pharmacistId=${pharmacistId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`, // Add authorization header
             },
         });
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error('Error fetching inventory');
         }
-        const data = await response.json();
+        const data = response.data;
         setInventoryData(data);
         setErrorMessage('');
     } catch (err) {
@@ -67,12 +68,12 @@ const PharmacistInventory = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/orders?pharmacistId=${pharmacistId}`, {
+      const response = await api.get(`${API_BASE_URL}/orders?pharmacistId=${pharmacistId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      const data = await response.json();
+      const data = response.data;
       setOrders(data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -87,19 +88,18 @@ const PharmacistInventory = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/prescriptions/${prescriptionIdInput}`, {
+      const response = await api.get(`${API_BASE_URL}/prescriptions/${prescriptionIdInput}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         setPrescriptionDetails(data); // Set fetched prescription details
         setErrorMessage("");
       } else {
-        const error = await response.json();
-        setErrorMessage("Failed to fetch prescription: " + error.message);
+        setErrorMessage("Failed to fetch prescription: " + response.data?.message);
         setPrescriptionDetails(null); // Clear details on failure
       }
     } catch (error) {
@@ -117,21 +117,18 @@ const PharmacistInventory = () => {
     const fulfillmentDate = new Date();
   
     try {
-      const response = await fetch(`${API_BASE_URL}/prescriptions/fulfill`, {
-        method: 'POST',
+      const response = await api.post(`${API_BASE_URL}/prescriptions/fulfill`, {
+        prescriptionId: prescriptionIdInput,
+        pharmacistId: pharmacistId,
+        fulfillmentDate: fulfillmentDate.toISOString().slice(0, 10),
+        priceInput: parseFloat(priceInput),  // Send the price here
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          prescriptionId: prescriptionIdInput,
-          pharmacistId: pharmacistId,
-          fulfillmentDate: fulfillmentDate.toISOString().slice(0, 10),
-          priceInput: parseFloat(priceInput),  // Send the price here
-        }),
       });
   
-      if (response.ok) {
+      if (response.status === 200) {
         setSuccessMessage("Prescription fulfilled successfully.");
         setErrorMessage("");
         setPrescriptionIdInput("");
@@ -139,8 +136,7 @@ const PharmacistInventory = () => {
         fetchInventory();
         fetchOrders();
       } else {
-        const error = await response.json();
-        setErrorMessage("Failed to fulfill prescription: " + error.message);
+        setErrorMessage("Failed to fulfill prescription: " + response.data?.message);
         setSuccessMessage("");
       }
     } catch (error) {
@@ -162,21 +158,18 @@ const PharmacistInventory = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/orders`, {
-        method: 'POST',
+      const response = await api.post(`${API_BASE_URL}/orders`, {
+        drugName: orderDrugName,
+        orderedQuantity: parseInt(orderQuantity, 10),
+        pharmacistId: pharmacistId,
+        supplierId: supplierId,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          drugName: orderDrugName,
-          orderedQuantity: parseInt(orderQuantity, 10),
-          pharmacistId: pharmacistId,
-          supplierId: supplierId,
-        }),
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setSuccessMessage("Order placed successfully.");
         setErrorMessage("");
         setOrderDrugName("");
@@ -207,25 +200,21 @@ const PharmacistInventory = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/changesupplier`, {
-        method: 'POST',
+      const response = await api.post(`${API_BASE_URL}/changesupplier`, {
+        pharmacistId: pharmacistId,
+        newSupplierId: newSupplierId,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          pharmacistId: pharmacistId,
-          newSupplierId: newSupplierId,
-        }),
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setSuccessMessage("Supplier change request submitted successfully.");
         setErrorMessage("");
         setNewSupplierId("");
       } else {
-        const error = await response.json();
-        setErrorMessage("Failed to submit supplier change request: " + error.message);
+        setErrorMessage("Failed to submit supplier change request: " + response.data?.message);
         setSuccessMessage("");
       }
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from '../../api';
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const RegistrationForm = () => {
@@ -31,7 +31,7 @@ const RegistrationForm = () => {
 
     try {
       console.log("Sending registration request to the server...");
-      const response = await axios.post("http://localhost:5000/api/auth/register", {
+      const response = await api.post("/api/auth/register", {
         id,
         username,
         password,

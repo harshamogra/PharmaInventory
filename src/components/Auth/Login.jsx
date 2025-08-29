@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import api from '../../api';
 import { Visibility, VisibilityOff } from '@mui/icons-material'; // Import MUI icons
 
 const Login = ({ setRole, setUserId }) => {
@@ -18,7 +18,7 @@ const Login = ({ setRole, setUserId }) => {
 
     try {
       // Send a POST request to the backend for authentication
-      const response = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+      const response = await api.post('/api/auth/login', { username, password });
 
       // If successful, handle login
       const { token, role, id } = response.data;

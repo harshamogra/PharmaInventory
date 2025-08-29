@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import api from '../../api';
 
 // Supplier component
 const Supplier = () => {
@@ -21,8 +22,8 @@ const Supplier = () => {
         }
 
         // Fetch orders from the server and filter by supplierId
-        const ordersResponse = await fetch(
-          `http://localhost:5000/api/supplier/orders?supplierId=${supplierId}`,
+        const ordersResponse = await api.get(
+          `/api/supplier/orders?supplierId=${supplierId}`,
           {
             headers: {
               "Authorization": `Bearer ${token}`, // Attach the JWT token here
@@ -30,12 +31,11 @@ const Supplier = () => {
           }
         );
 
-        if (ordersResponse.ok) {
-          const ordersData = await ordersResponse.json();
+        if (ordersResponse.status === 200) {
+          const ordersData = ordersResponse.data;
           setOrders(ordersData);
         } else {
-          const responseJson = await ordersResponse.json();
-          setError(responseJson.error || "Error fetching orders");
+          setError(ordersResponse.data?.error || "Error fetching orders");
         }
       } catch (error) {
         setError("Error fetching data: " + error.message);
@@ -52,21 +52,19 @@ const Supplier = () => {
     // If order is found and is still pending, proceed to confirm it
     if (order && order.status === "Pending") {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/supplier/orders/${orderId}/confirm`,
+        const response = await api.post(
+          `/api/supplier/orders/${orderId}/confirm`,
           {
-            method: "POST",
+            supplierId: supplierId,
+          },
+          {
             headers: {
-              "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`, // Attach the JWT token here
             },
-            body: JSON.stringify({
-              supplierId: supplierId,
-            }),
           }
         );
 
-        if (response.ok) {
+        if (response.status === 200) {
           // Update the order status to "Confirmed" in the UI
           setOrders((prevOrders) =>
             prevOrders.map((o) =>
@@ -74,7 +72,7 @@ const Supplier = () => {
             )
           );
         } else {
-          console.error("Error confirming order:", await response.json());
+          console.error("Error confirming order:", response.data);
         }
       } catch (error) {
         console.error("Error confirming order:", error);

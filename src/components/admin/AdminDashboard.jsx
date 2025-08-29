@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 
 const AdminDashboard = () => {
   const [role, setRole] = useState(""); // Store selected role
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   // Function to handle user deletion
   const handleDelete = (id, type) => {
     if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-      axios.delete(`http://localhost:5000/api/admin/${type}/${id}`, {
+      api.delete(`/api/admin/${type}/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -54,13 +54,13 @@ const AdminDashboard = () => {
   const handleUpdate = (e) => {
     e.preventDefault();
     const updateData = { ...formData };
-    axios.put(`http://localhost:5000/api/admin/${editUser.type}/${editUser.id}`, updateData, {
+    api.put(`/api/admin/${editUser.type}/${editUser.id}`, updateData, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     .then(response => {
       setEditUser(null); // Exit edit mode
       setFormData({ username: '', specialty: '', pharmacy_location: '', date_of_birth: '', contact_info: '', address: '' });
-      axios.get(`http://localhost:5000/api/admin/${editUser.type}`, { headers: { 'Authorization': `Bearer ${token}` } })
+      api.get(`/api/admin/${editUser.type}`, { headers: { 'Authorization': `Bearer ${token}` } })
         .then(res => {
           if (editUser.type === 'doctors') setDoctors(res.data);
           if (editUser.type === 'pharmacists') setPharmacists(res.data);
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
   // Fetch users and supplier change requests based on the selected role
   useEffect(() => {
     if (role) {
-      axios.get(`http://localhost:5000/api/admin/${role}`, {
+      api.get(`/api/admin/${role}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
     }
 
     // Fetch supplier change requests sent by pharmacists
-    axios.get("http://localhost:5000/api/admin/supplier-change-requests", {
+    api.get("/api/admin/supplier-change-requests", {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
       console.error("Error fetching supplier change requests:", error);
     });
      
-    axios.get("http://localhost:5000/api/admin/top-pharmacist", {
+    api.get("/api/admin/top-pharmacist", {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -149,7 +149,7 @@ const handleFulfillRequest = (id, pharmacist_id, new_supplier_id) => {
     new_supplier_id
   };
   console.log(pharmacist_id,new_supplier_id)
-  axios.put(`http://localhost:5000/api/admin/fulfill-supplier-change/${id}`, requestData, {
+  api.put(`/api/admin/fulfill-supplier-change/${id}`, requestData, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

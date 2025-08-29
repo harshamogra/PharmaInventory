@@ -25,5 +25,3 @@ dist-ssr
 
 #environment variables...
 backend/.env
-
-ca.pem

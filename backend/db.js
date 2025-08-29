@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: {
-    ca: fs.readFileSync('../ca.pem'),  // path to your downloaded CA cert
+    ca: fs.readFileSync('./ca.pem'),  // path to your downloaded CA cert
   },
   connectTimeout: 10000, // optional, increase timeout if needed
 });
